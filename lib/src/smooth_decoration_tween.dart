@@ -12,25 +12,27 @@ class SmoothDecorationTween extends DecorationTween {
   @override
   Decoration lerp(double t) {
     if (begin is BoxDecoration && end is BoxDecoration) {
-      return lerpDecoration(begin as BoxDecoration, end as BoxDecoration, t) ??
+      return lerpBoxDecoration(
+              begin as BoxDecoration, end as BoxDecoration, t) ??
           BoxDecoration();
     }
     return Decoration.lerp(begin, end, t) ?? BoxDecoration();
   }
 
-  bool sameGradient(Gradient a, Gradient b) {
+  bool _isSameGradient(Gradient a, Gradient b) {
     return (a is LinearGradient && b is LinearGradient) ||
         (a is RadialGradient && b is RadialGradient) ||
         (a is SweepGradient && b is SweepGradient);
   }
 
-  Decoration? lerpDecoration(BoxDecoration? a, BoxDecoration? b, double t) {
+  Decoration? lerpBoxDecoration(BoxDecoration? a, BoxDecoration? b, double t) {
     assert(t != null);
     if (a == null && b == null) return null;
     if (a == null) return b!.scale(t);
     if (b == null) return a.scale(1.0 - t);
     if (t == 0.0) return a;
     if (t == 1.0) return b;
+    if (a == b) return a;
 
     ///If there is image in either a or b or
     ///if the gradient in a and b are not the same type,
@@ -39,7 +41,7 @@ class SmoothDecorationTween extends DecorationTween {
         b.image != null ||
         (a.gradient != null &&
             b.gradient != null &&
-            !sameGradient(a.gradient!, b.gradient!))) {
+            !_isSameGradient(a.gradient!, b.gradient!))) {
       DecorationImage? aImageAtT, bImageAtT;
 
       if (a.image != null) {
@@ -82,8 +84,8 @@ class SmoothDecorationTween extends DecorationTween {
 
       return BoxDecorationMix(
         color: Color.lerp(a.color, b.color, t),
-        image1: t < 0.5 ? bImageAtT : aImageAtT,
-        image2: t < 0.5 ? aImageAtT : bImageAtT,
+        image1: aImageAtT,
+        image2: bImageAtT,
         border: BoxBorder.lerp(a.border, b.border, t),
         borderRadius:
             BorderRadiusGeometry.lerp(a.borderRadius, b.borderRadius, t),
