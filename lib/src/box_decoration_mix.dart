@@ -445,7 +445,7 @@ class _BoxDecorationMixPainter extends BoxPainter {
         break;
     }
     _imagePainter2!
-        .paint(canvas, rect, clipPath, configuration, BlendMode.srcATop);
+        .paint(canvas, rect, clipPath, configuration, BlendMode.srcOver);
   }
 
   @override

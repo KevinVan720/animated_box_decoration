@@ -117,16 +117,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Decoration _imageDeco1 = BoxDecoration(
       image: DecorationImage(
-          opacity: 0.5,
+          //opacity: 0.5,
           fit: BoxFit.fill,
-          image: NetworkImage(
-              "https://images.unsplash.com/photo-1647504370987-85729e29ab93?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80")));
+          image: AssetImage("images/mojave_day_2.jpg")));
 
   Decoration _imageDeco2 = BoxDecoration(
       image: DecorationImage(
-          fit: BoxFit.fill,
-          image: NetworkImage(
-              "https://images.unsplash.com/photo-1640622841908-3a691b7b7ac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1776&q=80")));
+          fit: BoxFit.fill, image: AssetImage("images/mojave_day_3.jpg")));
 
   @override
   Widget build(BuildContext context) {
@@ -250,13 +247,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   AnimatedContainer(
                     width: 400,
                     height: 400,
-                    duration: Duration(seconds: 5),
+                    curve: Curves.easeInOut,
+                    duration: Duration(seconds: 2),
                     decoration: toggleStyle ? _imageDeco1 : _imageDeco2,
                   ),
                   SmoothAnimatedContainer(
                     width: 400,
                     height: 400,
-                    duration: Duration(seconds: 5),
+                    duration: Duration(seconds: 2),
+                    curve: Curves.easeInOut,
                     decoration: toggleStyle ? _imageDeco1 : _imageDeco2,
                   )
                 ],
