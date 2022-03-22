@@ -117,6 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Decoration _imageDeco1 = BoxDecoration(
       image: DecorationImage(
+          opacity: 0.5,
           fit: BoxFit.fill,
           image: NetworkImage(
               "https://images.unsplash.com/photo-1647504370987-85729e29ab93?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80")));
@@ -247,15 +248,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   AnimatedContainer(
-                    width: 200,
-                    height: 200,
-                    duration: Duration(seconds: 1),
+                    width: 400,
+                    height: 400,
+                    duration: Duration(seconds: 5),
                     decoration: toggleStyle ? _imageDeco1 : _imageDeco2,
                   ),
                   SmoothAnimatedContainer(
-                    width: 200,
-                    height: 200,
-                    duration: Duration(seconds: 1),
+                    width: 400,
+                    height: 400,
+                    duration: Duration(seconds: 5),
                     decoration: toggleStyle ? _imageDeco1 : _imageDeco2,
                   )
                 ],

@@ -4,9 +4,12 @@
 
 import 'dart:math' as math;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/painting.dart';
+
+import 'blend_decoration_image.dart';
 
 /// An immutable description of how to paint a box.
 ///
@@ -111,7 +114,6 @@ class BoxDecorationMix extends Decoration {
     BlendMode? backgroundBlendMode,
     BoxShape? shape,
   }) {
-
     return BoxDecorationMix(
       color: color ?? this.color,
       image1: image1 ?? this.image1,
@@ -419,11 +421,12 @@ class _BoxDecorationMixPainter extends BoxPainter {
     _imagePainter1!.paint(canvas, rect, clipPath, configuration);
   }
 
-  DecorationImagePainter? _imagePainter2;
+  BlendDecorationImagePainter? _imagePainter2;
   void _paintBackgroundImage2(
       Canvas canvas, Rect rect, ImageConfiguration configuration) {
     if (_decoration.image2 == null) return;
-    _imagePainter2 ??= _decoration.image2!.createPainter(onChanged!);
+    _imagePainter2 ??=
+        BlendDecorationImagePainter(_decoration.image2!, onChanged!);
     Path? clipPath;
     switch (_decoration.shape) {
       case BoxShape.circle:
@@ -441,7 +444,8 @@ class _BoxDecorationMixPainter extends BoxPainter {
                 .toRRect(rect));
         break;
     }
-    _imagePainter2!.paint(canvas, rect, clipPath, configuration);
+    _imagePainter2!
+        .paint(canvas, rect, clipPath, configuration, BlendMode.srcATop);
   }
 
   @override
