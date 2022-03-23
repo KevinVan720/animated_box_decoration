@@ -1,6 +1,6 @@
 name: animated_box_decoration
 description: Lets you smoothly animate between two BoxDecoration.
-version: 0.0.4
+version: 0.0.5
 repository: https://github.com/KevinVan720/animated_box_decoration
 
 environment:

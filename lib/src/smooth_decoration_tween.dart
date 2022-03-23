@@ -56,8 +56,9 @@ class SmoothDecorationTween extends DecorationTween {
           repeat: aImage.repeat,
           matchTextDirection: aImage.matchTextDirection,
           scale: aImage.scale,
-          opacity: aImage.opacity,
-          //opacity: lerpDouble(aImage.opacity, 0, t) ?? 0,
+          opacity: b.image != null
+              ? aImage.opacity
+              : (lerpDouble(aImage.opacity, 0, t) ?? 0),
           filterQuality: aImage.filterQuality,
           invertColors: aImage.invertColors,
           isAntiAlias: aImage.isAntiAlias,

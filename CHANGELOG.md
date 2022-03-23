@@ -13,3 +13,7 @@ Use blendmode to avoid brightness change during image tween
 ## 0.0.4
 
 Minor fix
+
+## 0.0.5
+
+Minor fix
