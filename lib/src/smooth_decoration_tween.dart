@@ -14,9 +14,9 @@ class SmoothDecorationTween extends DecorationTween {
     if (begin is BoxDecoration && end is BoxDecoration) {
       return lerpBoxDecoration(
               begin as BoxDecoration, end as BoxDecoration, t) ??
-          BoxDecoration();
+          const BoxDecoration();
     }
-    return Decoration.lerp(begin, end, t) ?? BoxDecoration();
+    return Decoration.lerp(begin, end, t) ?? const BoxDecoration();
   }
 
   bool _isSameGradient(Gradient a, Gradient b) {
@@ -26,7 +26,6 @@ class SmoothDecorationTween extends DecorationTween {
   }
 
   Decoration? lerpBoxDecoration(BoxDecoration? a, BoxDecoration? b, double t) {
-    assert(t != null);
     if (a == null && b == null) return null;
     if (a == null) return b!.scale(t);
     if (b == null) return a.scale(1.0 - t);
@@ -105,7 +104,7 @@ class SmoothDecorationTween extends DecorationTween {
             BorderRadiusGeometry.lerp(a.borderRadius, b.borderRadius, t),
         boxShadow: BoxShadow.lerpList(a.boxShadow, b.boxShadow, t),
         gradient: lerpGradient(t, a.gradient, b.gradient,
-            a.color ?? Color(0x00FFFFFF), b.color ?? Color(0x00FFFFFF)),
+            a.color ?? const Color(0x00FFFFFF), b.color ?? const Color(0x00FFFFFF)),
         shape: t < 0.5 ? a.shape : b.shape,
       );
     }
@@ -217,5 +216,6 @@ class SmoothDecorationTween extends DecorationTween {
         return Gradient.lerp(beginGradient, endGradient, t);
       }
     }
+    return null;
   }
 }

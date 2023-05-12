@@ -7,8 +7,6 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:flutter/painting.dart';
-
 import 'blend_decoration_image.dart';
 
 /// An immutable description of how to paint a box.
@@ -90,8 +88,7 @@ class BoxDecorationMix extends Decoration {
     this.gradient2,
     this.backgroundBlendMode,
     this.shape = BoxShape.rectangle,
-  })  : assert(shape != null),
-        assert(
+  })  : assert(
           backgroundBlendMode == null ||
               color != null ||
               gradient1 != null ||
@@ -217,7 +214,7 @@ class BoxDecorationMix extends Decoration {
   final BoxShape shape;
 
   @override
-  EdgeInsetsGeometry? get padding => border?.dimensions;
+  EdgeInsetsGeometry get padding => border?.dimensions ?? EdgeInsets.zero;
 
   @override
   Path getClipPath(Rect rect, TextDirection textDirection) {
@@ -228,9 +225,10 @@ class BoxDecorationMix extends Decoration {
         final Rect square = Rect.fromCircle(center: center, radius: radius);
         return Path()..addOval(square);
       case BoxShape.rectangle:
-        if (borderRadius != null)
+        if (borderRadius != null) {
           return Path()
             ..addRRect(borderRadius!.resolve(textDirection).toRRect(rect));
+        }
         return Path()..addRect(rect);
     }
   }
@@ -256,13 +254,13 @@ class BoxDecorationMix extends Decoration {
 
   @override
   int get hashCode {
-    return hashValues(
+    return Object.hash(
       color,
       image1,
       image2,
       border,
       borderRadius,
-      hashList(boxShadow),
+      Object.hashAll(boxShadow ?? []),
       gradient1,
       gradient2,
       shape,
@@ -271,7 +269,6 @@ class BoxDecorationMix extends Decoration {
 
   @override
   bool hitTest(Size size, Offset position, {TextDirection? textDirection}) {
-    assert(shape != null);
     assert((Offset.zero & size).contains(position));
     switch (shape) {
       case BoxShape.rectangle:
@@ -299,15 +296,13 @@ class BoxDecorationMix extends Decoration {
 /// An object that paints a [BoxDecorationMix] into a canvas.
 class _BoxDecorationMixPainter extends BoxPainter {
   _BoxDecorationMixPainter(this._decoration, VoidCallback? onChanged)
-      : assert(_decoration != null),
-        super(onChanged);
+      : super(onChanged);
 
   final BoxDecorationMix _decoration;
 
   Paint? _cachedBackgroundPaint1;
   Rect? _rectForCachedBackgroundPaint1;
   Paint _getBackgroundPaint1(Rect rect, TextDirection? textDirection) {
-    assert(rect != null);
     assert(_decoration.gradient1 != null ||
         _rectForCachedBackgroundPaint1 == null);
 
@@ -315,8 +310,9 @@ class _BoxDecorationMixPainter extends BoxPainter {
         (_decoration.gradient1 != null &&
             _rectForCachedBackgroundPaint1 != rect)) {
       final Paint paint = Paint();
-      if (_decoration.backgroundBlendMode != null)
+      if (_decoration.backgroundBlendMode != null) {
         paint.blendMode = _decoration.backgroundBlendMode!;
+      }
       if (_decoration.color != null) paint.color = _decoration.color!;
       if (_decoration.gradient1 != null) {
         paint.shader = _decoration.gradient1!
@@ -332,7 +328,6 @@ class _BoxDecorationMixPainter extends BoxPainter {
   Paint? _cachedBackgroundPaint2;
   Rect? _rectForCachedBackgroundPaint2;
   Paint _getBackgroundPaint2(Rect rect, TextDirection? textDirection) {
-    assert(rect != null);
     assert(_decoration.gradient2 != null ||
         _rectForCachedBackgroundPaint2 == null);
 
@@ -340,8 +335,9 @@ class _BoxDecorationMixPainter extends BoxPainter {
         (_decoration.gradient2 != null &&
             _rectForCachedBackgroundPaint2 != rect)) {
       final Paint paint = Paint();
-      if (_decoration.backgroundBlendMode != null)
+      if (_decoration.backgroundBlendMode != null) {
         paint.blendMode = _decoration.backgroundBlendMode!;
+      }
       if (_decoration.color != null) paint.color = _decoration.color!;
       if (_decoration.gradient2 != null) {
         paint.shader = _decoration.gradient2!
@@ -387,13 +383,15 @@ class _BoxDecorationMixPainter extends BoxPainter {
 
   void _paintBackgroundColor(
       Canvas canvas, Rect rect, TextDirection? textDirection) {
-    if (_decoration.color != null || _decoration.gradient1 != null)
+    if (_decoration.color != null || _decoration.gradient1 != null) {
       _paintBox(canvas, rect, _getBackgroundPaint1(rect, textDirection),
           textDirection);
+    }
 
-    if (_decoration.color != null || _decoration.gradient2 != null)
+    if (_decoration.color != null || _decoration.gradient2 != null) {
       _paintBox(canvas, rect, _getBackgroundPaint2(rect, textDirection),
           textDirection);
+    }
   }
 
   DecorationImagePainter? _imagePainter1;
@@ -411,11 +409,12 @@ class _BoxDecorationMixPainter extends BoxPainter {
         clipPath = Path()..addOval(square);
         break;
       case BoxShape.rectangle:
-        if (_decoration.borderRadius != null)
+        if (_decoration.borderRadius != null) {
           clipPath = Path()
             ..addRRect(_decoration.borderRadius!
                 .resolve(configuration.textDirection)
                 .toRRect(rect));
+        }
         break;
     }
     _imagePainter1!.paint(canvas, rect, clipPath, configuration);
@@ -437,11 +436,12 @@ class _BoxDecorationMixPainter extends BoxPainter {
         clipPath = Path()..addOval(square);
         break;
       case BoxShape.rectangle:
-        if (_decoration.borderRadius != null)
+        if (_decoration.borderRadius != null) {
           clipPath = Path()
             ..addRRect(_decoration.borderRadius!
                 .resolve(configuration.textDirection)
                 .toRRect(rect));
+        }
         break;
     }
     _imagePainter2!
@@ -458,7 +458,6 @@ class _BoxDecorationMixPainter extends BoxPainter {
   /// Paint the box decoration into the given location on the given canvas.
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
-    assert(configuration != null);
     assert(configuration.size != null);
     final Rect rect = offset & configuration.size!;
     final TextDirection? textDirection = configuration.textDirection;
