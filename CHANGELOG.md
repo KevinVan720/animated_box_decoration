@@ -21,3 +21,7 @@ Minor fix
 ## 0.0.6
 
 Remove unnecessary dependency
+
+## 0.0.7
+
+Update dependency
