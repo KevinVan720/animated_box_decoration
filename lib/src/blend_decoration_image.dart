@@ -18,8 +18,7 @@ import 'package:flutter/material.dart';
 /// This object should be disposed using the [dispose] method when it is no
 /// longer needed.
 class BlendDecorationImagePainter {
-  BlendDecorationImagePainter(this.details, this.onChanged)
-      : assert(details != null);
+  BlendDecorationImagePainter(this.details, this.onChanged);
 
   final DecorationImage details;
   final VoidCallback onChanged;
@@ -43,9 +42,6 @@ class BlendDecorationImagePainter {
   /// will be called.
   void paint(Canvas canvas, Rect rect, Path? clipPath,
       ImageConfiguration configuration, BlendMode blendMode) {
-    assert(canvas != null);
-    assert(rect != null);
-    assert(configuration != null);
 
     bool flipHorizontally = false;
     if (details.matchTextDirection) {
@@ -70,8 +66,9 @@ class BlendDecorationImagePainter {
         }
         return true;
       }());
-      if (configuration.textDirection == TextDirection.rtl)
+      if (configuration.textDirection == TextDirection.rtl) {
         flipHorizontally = true;
+      }
     }
 
     final ImageStream newImageStream = details.image.resolve(configuration);
@@ -121,7 +118,6 @@ class BlendDecorationImagePainter {
     }
     _image?.dispose();
     _image = value;
-    assert(onChanged != null);
     if (!synchronousCall) onChanged();
   }
 
@@ -253,12 +249,6 @@ void paintImage({
   FilterQuality filterQuality = FilterQuality.low,
   bool isAntiAlias = false,
 }) {
-  assert(canvas != null);
-  assert(image != null);
-  assert(alignment != null);
-  assert(repeat != null);
-  assert(flipHorizontally != null);
-  assert(isAntiAlias != null);
   assert(
     image.debugGetOpenHandleStackTraces()?.isNotEmpty ?? true,
     'Cannot paint an image that is disposed.\n'
@@ -322,7 +312,7 @@ void paintImage({
       // It's ok to use this instead of a MediaQuery because if this changes,
       // whatever is aware of the MediaQuery will be repainting the image anyway.
       displaySize:
-          outputSize * PaintingBinding.instance!.window.devicePixelRatio,
+          outputSize * PaintingBinding.instance.window.devicePixelRatio,
     );
     assert(() {
       if (debugInvertOversizedImages &&
@@ -388,7 +378,7 @@ void paintImage({
         _pendingImageSizeInfo[sizeInfo.source!] = sizeInfo;
       }
       debugOnPaintImage?.call(sizeInfo);
-      SchedulerBinding.instance!.addPostFrameCallback((Duration timeStamp) {
+      SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
         _lastFrameImageSizeInfo = _pendingImageSizeInfo.values.toSet();
         if (_pendingImageSizeInfo.isEmpty) {
           return;
@@ -424,8 +414,9 @@ void paintImage({
       canvas.drawImageRect(image, sourceRect, destinationRect, paint);
     } else {
       for (final Rect tileRect
-          in _generateImageTileRects(rect, destinationRect, repeat))
+          in _generateImageTileRects(rect, destinationRect, repeat)) {
         canvas.drawImageRect(image, sourceRect, tileRect, paint);
+      }
     }
   } else {
     canvas.scale(1 / scale);
@@ -434,9 +425,10 @@ void paintImage({
           _scaleRect(destinationRect, scale), paint);
     } else {
       for (final Rect tileRect
-          in _generateImageTileRects(rect, destinationRect, repeat))
+          in _generateImageTileRects(rect, destinationRect, repeat)) {
         canvas.drawImageNine(image, _scaleRect(centerSlice, scale),
             _scaleRect(tileRect, scale), paint);
+      }
     }
   }
   if (needSave) canvas.restore();
