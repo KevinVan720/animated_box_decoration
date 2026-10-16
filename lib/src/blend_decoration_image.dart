@@ -1,26 +1,44 @@
+// Copyright 2014 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// A copy of Flutter's DecorationImagePainter and paintImage
+// (package:flutter/src/painting/decoration_image.dart) that paints with a given
+// blend mode.
+
 import 'dart:developer' as developer;
-import 'dart:ui' as ui show Image;
+import 'dart:math' as math;
+import 'dart:ui' as ui show FlutterView, Image;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart'
+    hide debugFlushLastFrameImageSizeInfo, paintImage;
 import 'package:flutter/scheduler.dart';
 
-import 'package:flutter/material.dart';
-
-/// The painter for a [BlendDecorationImage].
+/// The painter for a [DecorationImage] that is painted with a [BlendMode].
 ///
-/// To obtain a painter, call [BlendDecorationImage.createPainter].
-///
-/// To paint, call [paint]. The `onChanged` callback passed to
-/// [BlendDecorationImage.createPainter] will be called if the image needs to paint
-/// again (e.g. because it is animated or because it had not yet loaded the
-/// first time the [paint] method was called).
+/// To paint, call [paint]. The [onChanged] callback will be called if the
+/// image needs to paint again (e.g. because it is animated or because it had
+/// not yet loaded the first time the [paint] method was called).
 ///
 /// This object should be disposed using the [dispose] method when it is no
 /// longer needed.
 class BlendDecorationImagePainter {
-  BlendDecorationImagePainter(this.details, this.onChanged);
+  /// Creates a painter for [details].
+  BlendDecorationImagePainter(this.details, this.onChanged) {
+    if (kFlutterMemoryAllocationsEnabled) {
+      FlutterMemoryAllocations.instance.dispatchObjectCreated(
+        library: 'package:animated_box_decoration/animated_box_decoration.dart',
+        className: '$BlendDecorationImagePainter',
+        object: this,
+      );
+    }
+  }
 
+  /// The image to paint.
   final DecorationImage details;
+
+  /// Called when the image needs to be painted again.
   final VoidCallback onChanged;
 
   ImageStream? _imageStream;
@@ -28,21 +46,20 @@ class BlendDecorationImagePainter {
 
   /// Draw the image onto the given canvas.
   ///
-  /// The image is drawn at the position and size given by the `rect` argument.
+  /// The image is drawn at the position and size given by the `rect` argument,
+  /// using the given `blendMode`.
   ///
   /// The image is clipped to the given `clipPath`, if any.
   ///
   /// The `configuration` object is used to resolve the image (e.g. to pick
   /// resolution-specific assets), and to implement the
-  /// [BlendDecorationImage.matchTextDirection] feature.
+  /// [DecorationImage.matchTextDirection] feature.
   ///
   /// If the image needs to be painted again, e.g. because it is animated or
   /// because it had not yet been loaded the first time this method was called,
-  /// then the `onChanged` callback passed to [BlendDecorationImage.createPainter]
-  /// will be called.
+  /// then the [onChanged] callback will be called.
   void paint(Canvas canvas, Rect rect, Path? clipPath,
       ImageConfiguration configuration, BlendMode blendMode) {
-
     bool flipHorizontally = false;
     if (details.matchTextDirection) {
       assert(() {
@@ -81,7 +98,9 @@ class BlendDecorationImagePainter {
       _imageStream = newImageStream;
       _imageStream!.addListener(listener);
     }
-    if (_image == null) return;
+    if (_image == null) {
+      return;
+    }
 
     if (clipPath != null) {
       canvas.save();
@@ -107,18 +126,24 @@ class BlendDecorationImagePainter {
       isAntiAlias: details.isAntiAlias,
     );
 
-    if (clipPath != null) canvas.restore();
+    if (clipPath != null) {
+      canvas.restore();
+    }
   }
 
   void _handleImage(ImageInfo value, bool synchronousCall) {
-    if (_image == value) return;
+    if (_image == value) {
+      return;
+    }
     if (_image != null && _image!.isCloneOf(value)) {
       value.dispose();
       return;
     }
     _image?.dispose();
     _image = value;
-    if (!synchronousCall) onChanged();
+    if (!synchronousCall) {
+      onChanged();
+    }
   }
 
   /// Releases the resources used by this painter.
@@ -128,6 +153,9 @@ class BlendDecorationImagePainter {
   /// After this method has been called, the object is no longer usable.
   @mustCallSuper
   void dispose() {
+    if (kFlutterMemoryAllocationsEnabled) {
+      FlutterMemoryAllocations.instance.dispatchObjectDisposed(object: this);
+    }
     _imageStream?.removeListener(ImageStreamListener(
       _handleImage,
       onError: details.onError,
@@ -138,7 +166,7 @@ class BlendDecorationImagePainter {
 
   @override
   String toString() {
-    return '${objectRuntimeType(this, 'DecorationImagePainter')}(stream: $_imageStream, image: $_image) for $details';
+    return '${objectRuntimeType(this, 'BlendDecorationImagePainter')}(stream: $_imageStream, image: $_image) for $details';
   }
 }
 
@@ -163,6 +191,9 @@ void debugFlushLastFrameImageSizeInfo() {
 
 /// Paints an image into the given rectangle on the canvas.
 ///
+/// This is Flutter's `paintImage`, except that the `blendMode` argument is
+/// required.
+///
 /// The arguments have the following meanings:
 ///
 ///  * `canvas`: The canvas onto which the image will be painted.
@@ -173,9 +204,12 @@ void debugFlushLastFrameImageSizeInfo() {
 ///
 ///  * `image`: The image to paint onto the canvas.
 ///
+///  * `blendMode`: How the image is blended onto the canvas.
+///
 ///  * `scale`: The number of image pixels for each logical pixel.
 ///
-///  * `opacity`: The opacity to paint the image onto the canvas with.
+///  * `opacity`: The opacity to paint the image onto the canvas with. Values
+///    outside of the range 0.0 to 1.0 are clamped.
 ///
 ///  * `colorFilter`: If non-null, the color filter to apply when painting the
 ///    image.
@@ -201,7 +235,7 @@ void debugFlushLastFrameImageSizeInfo() {
 ///    corners of the destination rectangle defined by applying `fit`. The
 ///    remaining five regions are drawn by stretching them to fit such that they
 ///    exactly cover the destination rectangle while maintaining their relative
-///    positions.
+///    positions. See also [Canvas.drawImageNine].
 ///
 ///  * `repeat`: If the image does not fill `rect`, whether and how the image
 ///    should be repeated to fill `rect`. By default, the image is not repeated.
@@ -219,18 +253,12 @@ void debugFlushLastFrameImageSizeInfo() {
 ///    smart invert on iOS.
 ///
 ///  * `filterQuality`: Use this to change the quality when scaling an image.
-///     Use the [FilterQuality.low] quality setting to scale the image, which corresponds to
-///     bilinear interpolation, rather than the default [FilterQuality.none] which corresponds
-///     to nearest-neighbor.
-///
-/// The `canvas`, `rect`, `image`, `scale`, `alignment`, `repeat`, `flipHorizontally` and `filterQuality`
-/// arguments must not be null.
+///    Defaults to [FilterQuality.low].
 ///
 /// See also:
 ///
 ///  * [paintBorder], which paints a border around a rectangle on a canvas.
-///  * [BlendDecorationImage], which holds a configuration for calling this function.
-///  * [BoxDecoration], which uses this function to paint a [BlendDecorationImage].
+///  * [DecorationImage], which holds a configuration for calling this function.
 void paintImage({
   required Canvas canvas,
   required Rect rect,
@@ -255,7 +283,9 @@ void paintImage({
     'The caller of paintImage is expected to wait to dispose the image until '
     'after painting has completed.',
   );
-  if (rect.isEmpty) return;
+  if (rect.isEmpty) {
+    return;
+  }
   Size outputSize = rect.size;
   Size inputSize = Size(image.width.toDouble(), image.height.toDouble());
   Offset? sliceBorder;
@@ -285,8 +315,10 @@ void paintImage({
     repeat = ImageRepeat.noRepeat;
   }
   final Paint paint = Paint()..isAntiAlias = isAntiAlias;
-  if (colorFilter != null) paint.colorFilter = colorFilter;
-  paint.color = Color.fromRGBO(0, 0, 0, opacity);
+  if (colorFilter != null) {
+    paint.colorFilter = colorFilter;
+  }
+  paint.color = Color.fromRGBO(0, 0, 0, clampDouble(opacity, 0.0, 1.0));
   paint.filterQuality = filterQuality;
   paint.invertColors = invertColors;
   paint.blendMode = blendMode;
@@ -303,16 +335,31 @@ void paintImage({
   // Set to true if we added a saveLayer to the canvas to invert/flip the image.
   bool invertedCanvas = false;
   // Output size and destination rect are fully calculated.
+
+  // Implement debug-mode and profile-mode features:
+  //  - cacheWidth/cacheHeight warning
+  //  - debugInvertOversizedImages
+  //  - debugOnPaintImage
+  //  - Flutter.ImageSizesForFrame events in timeline
   if (!kReleaseMode) {
+    // We can use the devicePixelRatio of the views directly here (instead of
+    // going through a MediaQuery) because if it changes, whatever is aware of
+    // the MediaQuery will be repainting the image anyways.
+    // Furthermore, for the memory check below we just assume that all images
+    // are decoded for the view with the highest device pixel ratio and use that
+    // as an upper bound for the display size of the image.
+    final double maxDevicePixelRatio =
+        PaintingBinding.instance.platformDispatcher.views.fold(
+      0.0,
+      (double previousValue, ui.FlutterView view) =>
+          math.max(previousValue, view.devicePixelRatio),
+    );
     final ImageSizeInfo sizeInfo = ImageSizeInfo(
       // Some ImageProvider implementations may not have given this.
       source:
           debugImageLabel ?? '<Unknown Image(${image.width}×${image.height})>',
       imageSize: Size(image.width.toDouble(), image.height.toDouble()),
-      // It's ok to use this instead of a MediaQuery because if this changes,
-      // whatever is aware of the MediaQuery will be repainting the image anyway.
-      displaySize:
-          outputSize * PaintingBinding.instance.window.devicePixelRatio,
+      displaySize: outputSize * maxDevicePixelRatio,
     );
     assert(() {
       if (debugInvertOversizedImages &&
@@ -326,7 +373,8 @@ void paintImage({
           exception: 'Image $debugImageLabel has a display size of '
               '$outputWidth×$outputHeight but a decode size of '
               '${image.width}×${image.height}, which uses an additional '
-              '${overheadInKilobytes}KB.\n\n'
+              '${overheadInKilobytes}KB (assuming a device pixel ratio of '
+              '$maxDevicePixelRatio).\n\n'
               'Consider resizing the asset ahead of time, supplying a cacheWidth '
               'parameter of $outputWidth, a cacheHeight parameter of '
               '$outputHeight, or using a ResizeImage.',
@@ -338,26 +386,10 @@ void paintImage({
           destinationRect,
           Paint()
             ..colorFilter = const ColorFilter.matrix(<double>[
-              -1,
-              0,
-              0,
-              0,
-              255,
-              0,
-              -1,
-              0,
-              0,
-              255,
-              0,
-              0,
-              -1,
-              0,
-              255,
-              0,
-              0,
-              0,
-              1,
-              0,
+              -1, 0, 0, 0, 255, //
+              0, -1, 0, 0, 255, //
+              0, 0, -1, 0, 255, //
+              0, 0, 0, 1, 0, //
             ]),
         );
         // Flip the canvas vertically.
@@ -378,27 +410,35 @@ void paintImage({
         _pendingImageSizeInfo[sizeInfo.source!] = sizeInfo;
       }
       debugOnPaintImage?.call(sizeInfo);
-      SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
-        _lastFrameImageSizeInfo = _pendingImageSizeInfo.values.toSet();
-        if (_pendingImageSizeInfo.isEmpty) {
-          return;
-        }
-        developer.postEvent(
-          'Flutter.ImageSizesForFrame',
-          <String, Object>{
-            for (ImageSizeInfo imageSizeInfo in _pendingImageSizeInfo.values)
-              imageSizeInfo.source!: imageSizeInfo.toJson(),
-          },
-        );
-        _pendingImageSizeInfo = <String, ImageSizeInfo>{};
-      });
+      SchedulerBinding.instance.addPostFrameCallback(
+        (Duration timeStamp) {
+          _lastFrameImageSizeInfo = _pendingImageSizeInfo.values.toSet();
+          if (_pendingImageSizeInfo.isEmpty) {
+            return;
+          }
+          developer.postEvent(
+            'Flutter.ImageSizesForFrame',
+            <String, Object>{
+              for (final ImageSizeInfo imageSizeInfo
+                  in _pendingImageSizeInfo.values)
+                imageSizeInfo.source!: imageSizeInfo.toJson(),
+            },
+          );
+          _pendingImageSizeInfo = <String, ImageSizeInfo>{};
+        },
+        debugLabel: 'paintImage.recordImageSizes',
+      );
     }
   }
 
   final bool needSave =
       centerSlice != null || repeat != ImageRepeat.noRepeat || flipHorizontally;
-  if (needSave) canvas.save();
-  if (repeat != ImageRepeat.noRepeat) canvas.clipRect(rect);
+  if (needSave) {
+    canvas.save();
+  }
+  if (repeat != ImageRepeat.noRepeat) {
+    canvas.clipRect(rect);
+  }
   if (flipHorizontally) {
     final double dx = -(rect.left + rect.width / 2.0);
     canvas.translate(-dx, 0.0);
@@ -431,7 +471,9 @@ void paintImage({
       }
     }
   }
-  if (needSave) canvas.restore();
+  if (needSave) {
+    canvas.restore();
+  }
 
   if (invertedCanvas) {
     canvas.restore();

@@ -1,15 +1,29 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 import 'smooth_decoration_tween.dart';
 
+/// Animated version of [Container] that gradually changes its values over a
+/// period of time, like [AnimatedContainer], but animates its [decoration] and
+/// [foregroundDecoration] with a [SmoothDecorationTween].
+///
+/// This means that it smoothly animates between a color and a gradient,
+/// between gradients of different types, and from, to or between images,
+/// which [AnimatedContainer] does not.
+///
+/// The [SmoothAnimatedContainer] will automatically animate between the old
+/// and new values of properties when they change using the provided curve and
+/// duration. Properties that are null are not animated. Its child and
+/// descendants are not animated.
+///
+/// See also:
+///
+///  * [AnimatedContainer], the widget this one is modeled after.
+///  * [SmoothDecorationTween], which interpolates the decorations.
 class SmoothAnimatedContainer extends ImplicitlyAnimatedWidget {
   /// Creates a container that animates its parameters implicitly.
-  ///
-  /// The [curve] and [duration] arguments must not be null.
   SmoothAnimatedContainer({
-    Key? key,
+    super.key,
     this.alignment,
     this.padding,
     Color? color,
@@ -23,9 +37,9 @@ class SmoothAnimatedContainer extends ImplicitlyAnimatedWidget {
     this.transformAlignment,
     this.child,
     this.clipBehavior = Clip.none,
-    Curve curve = Curves.linear,
-    required Duration duration,
-    VoidCallback? onEnd,
+    super.curve,
+    required super.duration,
+    super.onEnd,
   })  : assert(margin == null || margin.isNonNegative),
         assert(padding == null || padding.isNonNegative),
         assert(decoration == null || decoration.debugAssertIsValid()),
@@ -40,8 +54,7 @@ class SmoothAnimatedContainer extends ImplicitlyAnimatedWidget {
         constraints = (width != null || height != null)
             ? constraints?.tighten(width: width, height: height) ??
                 BoxConstraints.tightFor(width: width, height: height)
-            : constraints,
-        super(key: key, curve: curve, duration: duration, onEnd: onEnd);
+            : constraints;
 
   /// The [child] contained by the container.
   ///

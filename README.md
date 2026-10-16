@@ -24,10 +24,22 @@ and anything involving a image.
 
 If you want to get a intermediate Decoration at progress t between the initial and final Decoration, use:
 ```dart
-const intermediate=SmoothDecorationTween(begin: begin, end: end, t);
+final Decoration intermediate =
+    SmoothDecorationTween(begin: begin, end: end).transform(t);
 ```
 
-You can also just use the SmoothAnimatedContainer widget just as you use the AnimatedContainer widget.
+You can also just use the SmoothAnimatedContainer widget just as you use the AnimatedContainer widget:
+```dart
+SmoothAnimatedContainer(
+  duration: const Duration(seconds: 1),
+  width: 200,
+  height: 200,
+  decoration: toggled ? decoration1 : decoration2,
+)
+```
+
+The package only depends on `package:flutter/widgets.dart`, so it works in apps
+that use Material, Cupertino or neither.
 
 ## Additional information
 

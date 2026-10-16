@@ -6,7 +6,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -51,10 +51,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool toggleStyle = true;
 
-  Decoration _colorDeco1 = BoxDecoration(color: Colors.blue);
-  Decoration _colorDeco2 = BoxDecoration(color: Colors.red);
+  final Decoration _colorDeco1 = BoxDecoration(color: Colors.blue);
+  final Decoration _colorDeco2 = BoxDecoration(color: Colors.red);
 
-  Decoration _linearGradientDeco1 = BoxDecoration(
+  final Decoration _linearGradientDeco1 = BoxDecoration(
       gradient: LinearGradient(colors: [
     Colors.black87,
     Color(0xFF04619f),
@@ -68,14 +68,14 @@ class _MyHomePageState extends State<MyHomePage> {
     0.8,
     0.98
   ]));
-  Decoration _linearGradientDeco2 = BoxDecoration(
+  final Decoration _linearGradientDeco2 = BoxDecoration(
       gradient: LinearGradient(colors: [
     Color(0xFFF6EA41),
     Color(0xFFEEBD89),
     Color(0xFFD13ABD),
     Color(0xFFAEBAF8),
   ]));
-  Decoration _sweepGradientDeco1 = BoxDecoration(
+  final Decoration _sweepGradientDeco1 = BoxDecoration(
       gradient: SweepGradient(
           center: Alignment(0.13, 0.1),
           startAngle: 0.5,
@@ -95,33 +95,13 @@ class _MyHomePageState extends State<MyHomePage> {
         0.98
       ]));
 
-  Decoration _sweepGradientDeco2 = BoxDecoration(
-      gradient: SweepGradient(
-          center: Alignment(0.03, -0.17),
-          startAngle: 0.1,
-          endAngle: 5.3,
-          colors: [
-        Colors.black87,
-        Color(0xFF04619f),
-        Color(0xFF358f74),
-        Color(0xFF923cb5),
-        Colors.black87,
-      ],
-          stops: [
-        0.1,
-        0.3,
-        0.45,
-        0.8,
-        0.98
-      ]));
-
-  Decoration _imageDeco1 = BoxDecoration(
+  final Decoration _imageDeco1 = BoxDecoration(
       image: DecorationImage(
           //opacity: 0.5,
           fit: BoxFit.fill,
           image: AssetImage("images/mojave_day_2.jpg")));
 
-  Decoration _imageDeco2 = BoxDecoration(
+  final Decoration _imageDeco2 = BoxDecoration(
       image: DecorationImage(
           fit: BoxFit.fill, image: AssetImage("images/mojave_day_3.jpg")));
 

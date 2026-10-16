@@ -1,11 +1,11 @@
 name: animated_box_decoration
 description: Lets you smoothly animate between two BoxDecoration.
-version: 0.0.7
+version: 0.0.8
 repository: https://github.com/KevinVan720/animated_box_decoration
 
 environment:
-  sdk: ">=2.16.1 <4.0.0"
-  flutter: ">=1.17.0"
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.27.0"
 
 dependencies:
   flutter:
@@ -14,7 +14,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.1
+  flutter_lints: ^6.0.0
 
 flutter:
-
